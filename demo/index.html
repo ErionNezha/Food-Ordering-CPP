@@ -1,0 +1,80 @@
+<!-- Created by Erion Nezha — © 2026 All rights reserved -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍔 Carl's Jr. Fast Food Ordering — Web Port</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0b0f14;color:#e6e6e6;font-family:'Consolas','Courier New',monospace;min-height:100vh;display:flex;flex-direction:column}
+header.top{background:linear-gradient(135deg,#101820,#1b2a3a);padding:18px 20px;text-align:center;border-bottom:2px solid #00d4ff33}
+header.top h1{font-size:1.25rem;color:#fff}
+header.top p{color:#9fb3c8;font-size:.82rem;margin-top:6px}
+.wrap{flex:1;max-width:900px;width:100%;margin:0 auto;padding:18px;display:flex;flex-direction:column}
+.term{background:#05070b;border:1px solid #00d4ff33;border-radius:10px;padding:16px;height:60vh;overflow-y:auto;white-space:pre-wrap;font-size:.92rem;line-height:1.6;color:#c8ffb0}
+.inrow{display:flex;align-items:center;gap:8px;margin-top:10px;background:#05070b;border:1px solid #00d4ff55;border-radius:8px;padding:10px 14px}
+.inrow .prompt{color:#00d4ff;font-weight:700}
+.inrow input{flex:1;background:transparent;border:none;outline:none;color:#fff;font-family:inherit;font-size:.95rem}
+footer{text-align:center;padding:14px;color:#5c6b7f;font-size:.85rem;border-top:1px solid #ffffff10}
+footer strong{color:#9fb3c8}
+</style>
+</head>
+<body>
+<header class="top"><h1>🍔 Carl's Jr. Fast Food Ordering</h1><p>Web port of ORDERINGC.cpp — pizzas, burgers, sandwiches, rolls and biryani with billing.</p></header>
+<div class="wrap"><div class="term" id="term"></div>
+<div class="inrow"><span class="prompt">&rsaquo;</span><input id="inp" autocomplete="off" spellcheck="false" placeholder="Type here and press Enter…"></div></div>
+<footer>Krijuar nga <strong>Erion Nezha</strong> — © 2026</footer>
+<script>
+const termEl=document.getElementById('term'),inp=document.getElementById('inp');
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function print(t){termEl.innerHTML+=esc(t)+'\n';termEl.scrollTop=termEl.scrollHeight;}
+function ask(q){return new Promise(function(res){print(q);inp.focus();function h(e){if(e.key==='Enter'){inp.removeEventListener('keydown',h);var v=inp.value;inp.value='';print('> '+v);res(v.trim());}}inp.addEventListener('keydown',h);});}
+function pause(){return new Promise(function(r){setTimeout(r,250);});}
+window.addEventListener('load',function(){main();});
+
+var PIZZAS=[{n:'Chicken Fazita'},{n:'Chicken Bar BQ'},{n:'Peri Peri'},{n:'Creamy Max'}];
+var BURGERS=[{n:'Zinger Burger',p:180},{n:'Chicken Burger',p:150},{n:'Beef Burger',p:160}];
+var SANDS=[{n:'Club Sandwich',p:240},{n:'Chicken Crispy Sandwich',p:160},{n:'Extream Veg Sandwich',p:100}];
+var ROLLS=[{n:'Chicken Chatni Roll',p:150},{n:'Chicken Mayo Roll',p:100},{n:'Veg Roll With Fries',p:120}];
+var BIRY=[{n:'Chicken Biryani',p:160},{n:'Prawn Biryani',p:220},{n:'Beef Biryani',p:140}];
+function bill(qty,name,total){
+  print('\t\t\t--------Your Order---------');
+  print(qty+' '+name);
+  print('Your Total Bill is '+total);
+  print('Your Order Will be delivered in 40 Minutes');
+  print('Thank you For Ordering From Carl\'s Jr. Fast Food');
+}
+async function pick(list){
+  list.forEach(function(it,i){print((i+1)+') '+it.n+(it.p?' Rs.'+it.p:''));});
+  var c=parseInt(await ask('\nPlease Enter your choice: '),10);
+  return (c>=1&&c<=list.length)?list[c-1]:null;
+}
+async function main(){
+  print("\t\t\t----------Carl's Jr. Fast Food-----------\n");
+  var name=await ask('Please Enter Your Name: ');
+  print('Hello '+name+'\n\nWhat would you like to order?\n');
+  print('\t\t\t\t--------Menu--------\n');
+  print('1) Pizzas\n2) Burgers\n3) Sandwich\n4) Rolls\n5) Biryani\n');
+  var choice=await ask('Please Enter your Choice: ');
+  if(choice==='1'){
+    var f=await pick(PIZZAS); if(!f){print('Invalid flavour.');return;}
+    print('\n1) Small Rs.250\n2) Regular Rs.500\n3) Large Rs.900');
+    var s=await ask('\nChoose Size Please:');
+    var price=s==='1'?250:s==='2'?500:s==='3'?900:null;
+    if(!price){print('Invalid size.');return;}
+    var q=parseInt(await ask('\nPlease Enter Quantity: '),10)||1;
+    bill(q,f.n,price*q);
+  }else if(choice==='2'){var f=await pick(BURGERS);if(!f){print('Invalid.');return;}
+    var q=parseInt(await ask('\nPlease Enter Quantity: '),10)||1;bill(q,f.n,f.p*q);
+  }else if(choice==='3'){var f=await pick(SANDS);if(!f){print('Invalid.');return;}
+    var q=parseInt(await ask('\nPlease Enter Quantity: '),10)||1;bill(q,f.n,f.p*q);
+  }else if(choice==='4'){var f=await pick(ROLLS);if(!f){print('Invalid.');return;}
+    var q=parseInt(await ask('\nPlease Enter Quantity: '),10)||1;bill(q,f.n,f.p*q);
+  }else if(choice==='5'){var f=await pick(BIRY);if(!f){print('Invalid.');return;}
+    var q=parseInt(await ask('\nPlease Enter Quantity: '),10)||1;bill(q,f.n,f.p*q);
+  }else{print('Invalid choice.');}
+}
+</script>
+</body>
+</html>
